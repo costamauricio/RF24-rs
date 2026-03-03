@@ -62,6 +62,7 @@ pub struct NrfConfig {
     pub(crate) crc_encoding_scheme: EncodingScheme,
     pub(crate) ack_payloads_enabled: bool,
     pub(crate) auto_retry: AutoRetransmission,
+    pub(crate) auto_ack: bool,
 }
 
 impl NrfConfig {
@@ -109,6 +110,11 @@ impl NrfConfig {
         self.auto_retry = auto_retry.into();
         self
     }
+    /// Set if auto acknowledgements are enabled
+    pub fn auto_ack(mut self, auto_ack: bool) -> Self {
+        self.auto_ack = auto_ack;
+        self
+    }
 }
 
 impl Default for NrfConfig {
@@ -122,6 +128,7 @@ impl Default for NrfConfig {
             data_rate: DataRate::default(),
             ack_payloads_enabled: false,
             auto_retry: AutoRetransmission::default(),
+            auto_ack: true,
         }
     }
 }

@@ -149,6 +149,9 @@ where
         // clear CONFIG register, Enable PTX, Power Up & set CRC
         chip.write_register(Register::CONFIG, config_val)?;
 
+        // Set auto ack
+        chip.set_auto_ack(config.auto_ack)?;
+
         // wait for startup
         delay.delay_ms(5);
 
@@ -298,6 +301,11 @@ where
     /// If this is the case, just add a small delay between calling successive `data_available`.
     pub fn data_available(&mut self) -> NrfResult<bool, SPI, CE> {
         Ok(self.data_available_on_pipe()?.is_some())
+    }
+
+    pub fn set_auto_ack(&mut self, enabled: bool) -> NrfResult<(), SPI, CE> {
+        let en_aa = if enabled { 0x3f } else { 0x00 };
+        self.write_register(Register::EN_AA, en_aa)
     }
 
     /// Returns the data pipe where the data is available and `None` if no data available.
@@ -802,7 +810,7 @@ where
     /// Sends an instruction over the SPI bus without extra data.
     ///
     /// Returns the status recieved from the device.
-    /// Normally used for the other instructions than read and write.  
+    /// Normally used for the other instructions than read and write.
     fn send_command(&mut self, instruction: Instruction) -> NrfResult<Status, SPI, CE> {
         self.send_command_bytes(instruction, &[])
     }
